@@ -1,0 +1,16 @@
+{
+  "brand": {
+    "latin": "Mastrix Media",
+    "arabic": "ماستريكس ميديا"
+  },
+  "ledger": {
+    "placeholder": true,
+    "note": "* أرقام توضيحية",
+    "rows": [
+      { "label": "صرف الإعلان", "value": 3200, "decimals": 0, "prefix": "" },
+      { "label": "محادثات واتساب", "value": 418, "decimals": 0, "prefix": "" },
+      { "label": "المبيعات مقابل الصرف", "value": 6.1, "decimals": 1, "prefix": "×" }
+    ]
+  },
+  "seats": { "total": 8, "taken": 6 }
+}

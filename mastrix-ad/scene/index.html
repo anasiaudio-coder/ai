@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Mastrix Media Reel</title>
+<style>
+@import url(../node_modules/@fontsource/amiri/400.css);
+@import url(../node_modules/@fontsource/amiri/700.css);
+@import url(../node_modules/@fontsource/ibm-plex-sans-arabic/500.css);
+@import url(../node_modules/@fontsource/cormorant-garamond/600.css);
+
+:root {
+  --ivory: #EEE6D6;
+  --ivory-soft: rgba(238, 230, 214, .78);
+  --brass: #C9A86A;
+  --brass-line: rgba(201, 168, 106, .38);
+  --bottle: #0B231C;
+  --halo: rgba(6, 20, 15, .92);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bottle); }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+canvas { position: absolute; inset: 0; }
+#text { position: absolute; inset: 0; }
+
+.card {
+  position: absolute; left: 72px; right: 72px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; visibility: hidden;
+}
+.card.top { top: 286px; height: 480px; }
+.card.center { top: 300px; height: 900px; }
+
+.line {
+  font-family: "Amiri", serif; font-weight: 700; font-size: 92px; line-height: 1.42;
+  color: var(--ivory); text-wrap: balance;
+  text-shadow: 0 0 28px var(--halo), 0 0 60px var(--halo);
+}
+.hook .line { font-size: 140px; line-height: 1.3; }
+.hook.two .line { font-size: 112px; white-space: nowrap; }
+.compact .line { font-size: 80px; }
+.tone-brass { color: var(--brass); }
+.w { display: inline-block; }
+
+.ledger { position: absolute; top: 806px; left: 112px; right: 112px; }
+.row { position: relative; display: flex; justify-content: space-between; align-items: baseline; padding: 20px 4px 14px; }
+.rule { position: absolute; top: 0; right: 0; left: 0; height: 1.5px; background: var(--brass-line); transform-origin: right center; }
+.label { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 500; font-size: 40px; color: var(--ivory-soft); }
+.value {
+  font-family: "Cormorant Garamond", serif; font-weight: 600; font-size: 92px; line-height: 1;
+  color: var(--ivory); font-variant-numeric: lining-nums tabular-nums; direction: ltr;
+}
+.row:last-of-type .value { color: var(--brass); }
+.note { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 500; font-size: 26px; color: rgba(238, 230, 214, .5); padding-top: 14px; }
+
+.end { position: absolute; inset: 0; visibility: hidden; }
+.wordmark { position: absolute; top: 698px; left: 0; right: 0; text-align: center; }
+.wordmark .latin {
+  font-family: "Cormorant Garamond", serif; font-weight: 600; font-size: 78px; line-height: 1.05;
+  color: var(--ivory); direction: ltr; white-space: nowrap;
+}
+.wordmark .arabic { font-family: "Amiri", serif; font-weight: 400; font-size: 50px; color: var(--brass); margin-top: 6px; }
+.tagline { position: absolute; top: 872px; left: 72px; right: 72px; text-align: center; }
+.tagline .line { font-size: 104px; }
+.cta { position: absolute; top: 1046px; left: 72px; right: 72px; text-align: center; }
+.cta .rule { position: relative; width: 168px; margin: 0 auto 22px; transform-origin: center; }
+.cta .line { font-size: 58px; line-height: 1.38; }
+.cta .line + .line { color: var(--ivory-soft); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="fx" width="1080" height="1920"></canvas>
+  <div id="text"></div>
+  <canvas id="over" width="1080" height="1920"></canvas>
+</div>
+<script>
+const W = 1080, H = 1920;
+const params = new URLSearchParams(location.search);
+const VARIANT = params.get("v") || "A";
+const GUIDES = params.has("guides");
+
+const IVORY = [238, 230, 214], BRASS = [201, 168, 106], SAGE = [110, 142, 128];
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const prog = (t, start, dur) => clamp((t - start) / dur);
+const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const easeBack = (t) => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const hash = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const mix = (a, b, t) => a.map((v, i) => Math.round(lerp(v, b[i], t)));
+const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+function keyframes(t, keys) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    if (t <= keys[i][0]) {
+      const [t0, v0] = keys[i - 1], [t1, v1] = keys[i];
+      return lerp(v0, v1, easeInOut(clamp((t - t0) / Math.max(t1 - t0, 1e-6))));
+    }
+  }
+  return keys[keys.length - 1][1];
+}
+
+let TL, CFG, P, K, CUE;
+const fx = document.getElementById("fx").getContext("2d");
+const over = document.getElementById("over").getContext("2d");
+
+// ---------- the matrix: every dot is a person in the audience ----------
+const COLS = 18, ROWS = 32, SP = 60;
+const dots = [];
+for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+  const i = dots.length;
+  dots.push({ x: 30 + c * SP, y: 30 + r * SP, h1: hash(i), h2: hash(i + 977), h3: hash(i + 1913) });
+}
+const dotAt = (c, r) => r * COLS + c;
+const CUSTOMERS = [dotAt(3, 14), dotAt(13, 15), dotAt(8, 16), dotAt(15, 18), dotAt(5, 19)];
+
+const M_PATTERN = ["X.....X", "XX...XX", "X.X.X.X", "X..X..X", "X.....X", "X.....X", "X.....X"];
+const M_CENTER = { x: 540, y: 520 }, M_SP = 46;
+const M_TARGETS = [];
+M_PATTERN.forEach((row, r) => [...row].forEach((ch, c) => {
+  if (ch === "X") M_TARGETS.push({ x: M_CENTER.x + (c - 3) * M_SP, y: M_CENTER.y + (r - 3) * M_SP, focal: r === 3 && c === 3 });
+}));
+{ // each M dot is pulled from the nearest audience dot
+  const used = new Set(CUSTOMERS);
+  for (const tg of M_TARGETS) {
+    let best = -1, bd = Infinity;
+    dots.forEach((d, i) => {
+      if (used.has(i)) return;
+      const dd = (d.x - tg.x) ** 2 + (d.y - tg.y) ** 2;
+      if (dd < bd) { bd = dd; best = i; }
+    });
+    used.add(best); tg.src = best;
+  }
+}
+const M_SOURCES = new Set(M_TARGETS.map((m) => m.src));
+
+const grain = [];
+for (let k = 0; k < 4; k++) {
+  const g = document.createElement("canvas"); g.width = 540; g.height = 960;
+  const gx = g.getContext("2d"), img = gx.createImageData(540, 960);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = 128 + (hash(i * 0.37 + k * 9173) - 0.5) * 255;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255;
+  }
+  gx.putImageData(img, 0, 0); grain.push(g);
+}
+
+function fieldScale(t) { return 1 + 0.04 * (t / TL.duration); }
+function fieldPos(d, t) {
+  const s = fieldScale(t);
+  return { x: 540 + (d.x - 540) * s, y: 860 + (d.y - 860) * s };
+}
+
+function drawBackground(t) {
+  const g = fx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, "#0C251D"); g.addColorStop(1, "#061410");
+  fx.fillStyle = g; fx.fillRect(0, 0, W, H);
+  const gy = 760 + 40 * Math.sin(t * 0.35);
+  const r = fx.createRadialGradient(540, gy, 0, 540, gy, 980);
+  r.addColorStop(0, "rgba(28,66,53,0.85)"); r.addColorStop(1, "rgba(28,66,53,0)");
+  fx.fillStyle = r; fx.fillRect(0, 0, W, H);
+}
+
+function drawField(t) {
+  const dim = keyframes(t, [
+    [0, 1], [P.P2.start, 1], [P.P2.end, 0.5], [K.convert, 0.45], [K.convert + 0.5, 0.3],
+    [K.ledger + 0.5, 0.2], [K.seats + 0.5, 0.26], [CUE.mStart, 0.26], [CUE.mLock, 0.05], [TL.duration, 0.05],
+  ]);
+  const flashEnd = P.P2.start - 0.45;
+  dots.forEach((d, i) => {
+    if (CUSTOMERS.includes(i)) return;
+    if (t >= CUE.mStart && M_SOURCES.has(i)) return;
+    const p = fieldPos(d, t);
+    let flash = 0;
+    for (const h of [d.h1, d.h2]) {
+      const ft = 0.12 + h * flashEnd;
+      if (t >= ft) flash += Math.exp(-(t - ft) / 0.3) * clamp((t - ft) / 0.05);
+    }
+    flash = clamp(flash);
+    const twinkle = 0.82 + 0.18 * Math.sin(t * 1.4 + d.h3 * 40);
+    const a = (0.26 * twinkle + 0.9 * flash) * dim;
+    const rad = 2.7 + 1.8 * flash;
+    fx.fillStyle = rgba(mix(SAGE, IVORY, flash), a);
+    fx.beginPath(); fx.arc(p.x, p.y, rad, 0, Math.PI * 2); fx.fill();
+  });
+}
+
+function drawCustomers(t) {
+  const fadeOut = (i) => 1 - prog(t, CUE.pings[i] + 0.25, 0.7);
+  CUSTOMERS.forEach((idx, i) => {
+    const on = prog(t, CUE.customers[i], 0.45);
+    if (on <= 0) return;
+    const alive = fadeOut(i);
+    if (alive <= 0) return;
+    const p = fieldPos(dots[idx], t);
+    const breathe = 1 + 0.08 * Math.sin((t - CUE.customers[i]) * 3.2);
+    const rad = lerp(2.7, 10, easeBack(on)) * breathe;
+    fx.save();
+    fx.globalAlpha = alive;
+    fx.shadowColor = rgba(BRASS, 0.9); fx.shadowBlur = 28 * on;
+    fx.fillStyle = rgba(mix(SAGE, BRASS, on), 1);
+    fx.beginPath(); fx.arc(p.x, p.y, rad, 0, Math.PI * 2); fx.fill();
+    fx.restore();
+    const ring = prog(t, CUE.pings[i], 1.1);
+    if (ring > 0 && ring < 1) {
+      fx.strokeStyle = rgba(BRASS, 0.55 * (1 - ring)); fx.lineWidth = 2;
+      fx.beginPath(); fx.arc(p.x, p.y, 10 + 110 * easeOut(ring), 0, Math.PI * 2); fx.stroke();
+    }
+  });
+}
+
+const BUBBLE_W = [400, 300, 450, 340, 380];
+function drawBubbles(t) {
+  const cardAlpha = 1 - prog(t, K.ledger - 0.32, 0.3);
+  if (t < CUE.pings[0] || cardAlpha <= 0) return;
+  const h = 72, gap = 18, right = 912, baseY = 1168;
+  for (let i = 0; i < BUBBLE_W.length; i++) {
+    const spawn = CUE.pings[i] + 0.12;
+    if (t < spawn) continue;
+    let shift = 0;
+    for (let j = i + 1; j < BUBBLE_W.length; j++) shift += easeOut(prog(t, CUE.pings[j] + 0.12, 0.38));
+    const enter = easeOut(prog(t, spawn, 0.42));
+    const w = BUBBLE_W[i];
+    const y = baseY - shift * (h + gap) + (1 - enter) * 26;
+    const x0 = right - w;
+    const done = easeOut(prog(t, CUE.checks[i], 0.3));
+    fx.save();
+    fx.globalAlpha = enter * cardAlpha;
+    fx.translate(right, y); fx.scale(lerp(0.9, 1, enter), lerp(0.9, 1, enter)); fx.translate(-right, -y);
+    fx.beginPath();
+    fx.roundRect(x0, y - h / 2, w, h, 24);
+    fx.moveTo(right - 2, y - h / 2 + 4); fx.lineTo(right + 16, y - h / 2); fx.lineTo(right - 2, y - h / 2 + 22);
+    fx.fillStyle = rgba(IVORY, 0.07 + 0.05 * done); fx.fill();
+    fx.strokeStyle = rgba(mix(IVORY, BRASS, done), lerp(0.28, 0.9, done)); fx.lineWidth = 1.8; fx.stroke();
+    fx.fillStyle = rgba(IVORY, 0.26);
+    const inner = w - 150;
+    fx.beginPath(); fx.roundRect(right - 32 - inner * 0.92, y - 14, inner * 0.92, 9, 4.5); fx.fill();
+    fx.beginPath(); fx.roundRect(right - 32 - inner * 0.5, y + 6, inner * 0.5, 9, 4.5); fx.fill();
+    if (done > 0) {
+      const cx = x0 + 50, cy = y;
+      const pts = [[cx - 15, cy + 1], [cx - 4, cy + 12], [cx + 17, cy - 12]];
+      const l1 = Math.hypot(11, 11), l2 = Math.hypot(21, 24), total = l1 + l2, drawn = total * done;
+      fx.strokeStyle = rgba(BRASS, 1); fx.lineWidth = 5; fx.lineCap = "round"; fx.lineJoin = "round";
+      fx.beginPath(); fx.moveTo(...pts[0]);
+      if (drawn <= l1) fx.lineTo(lerp(pts[0][0], pts[1][0], drawn / l1), lerp(pts[0][1], pts[1][1], drawn / l1));
+      else { fx.lineTo(...pts[1]); const k = (drawn - l1) / l2; fx.lineTo(lerp(pts[1][0], pts[2][0], k), lerp(pts[1][1], pts[2][1], k)); }
+      fx.stroke();
+    }
+    fx.restore();
+  }
+}
+
+function drawSeats(t) {
+  const { total, taken } = CFG.seats;
+  const cardAlpha = 1 - prog(t, K.end - 0.3, 0.3);
+  if (t < K.seats || cardAlpha <= 0) return;
+  const perRow = Math.ceil(total / 2), sp = 172, r = 46;
+  for (let i = 0; i < total; i++) {
+    const row = Math.floor(i / perRow), col = i % perRow, n = row ? total - perRow : perRow;
+    const x = 540 + ((n - 1) / 2 - col) * sp, y = 922 + row * 182;
+    const appear = easeBack(prog(t, K.seats + 0.12 + i * 0.07, 0.5));
+    const filled = i < taken ? easeOut(prog(t, K.seats + 0.75 + i * 0.15, 0.4)) : 0;
+    fx.save();
+    fx.globalAlpha = clamp(appear) * cardAlpha;
+    fx.translate(x, y); fx.scale(appear, appear);
+    if (filled > 0) {
+      fx.shadowColor = rgba(BRASS, 0.6); fx.shadowBlur = 30 * filled;
+      fx.fillStyle = rgba(BRASS, filled);
+      fx.beginPath(); fx.arc(0, 0, r, 0, Math.PI * 2); fx.fill();
+      fx.shadowBlur = 0;
+    }
+    const pulse = i >= taken ? 0.55 + 0.45 * Math.sin(Math.max(0, t - P.P11.start) * 4.5 - Math.PI / 2) : 1;
+    fx.strokeStyle = rgba(BRASS, i >= taken ? 0.35 + 0.6 * (t > P.P11.start ? pulse : 0.3) : 0.9);
+    fx.lineWidth = 2.2;
+    fx.beginPath(); fx.arc(0, 0, r, 0, Math.PI * 2); fx.stroke();
+    fx.restore();
+  }
+}
+
+function drawMonogram(t) {
+  if (t < CUE.mStart) return;
+  const travel = CUE.mLock - CUE.mStart - 0.12;
+  const sweepX = lerp(-200, W + 200, prog(t, CUE.sweep, 1.1));
+  M_TARGETS.forEach((m, k) => {
+    const d = dots[m.src];
+    const p = easeInOut(prog(t, CUE.mStart + k * 0.006, travel));
+    const from = fieldPos(d, t);
+    const x = lerp(from.x, m.x, p), y = lerp(from.y, m.y, p);
+    const settle = 1 + 0.12 * Math.exp(-Math.max(0, t - CUE.mLock) * 5) * Math.sin(Math.max(0, t - CUE.mLock) * 18);
+    const shine = t > CUE.sweep ? Math.exp(-((x - sweepX - (y - M_CENTER.y) * 0.35) ** 2) / (2 * 55 ** 2)) : 0;
+    const rad = lerp(2.7, m.focal ? 12 : 10, p) * (p >= 1 ? settle : 1) + 2 * shine;
+    fx.save();
+    fx.shadowColor = rgba(BRASS, 0.85); fx.shadowBlur = 26 * p + 20 * shine;
+    fx.fillStyle = rgba(mix(mix(SAGE, BRASS, p), IVORY, shine * 0.8), lerp(0.3, 1, p));
+    fx.beginPath(); fx.arc(x, y, rad, 0, Math.PI * 2); fx.fill();
+    fx.restore();
+  });
+  const ring = prog(t, CUE.mLock, 1.5);
+  if (ring > 0 && ring < 1) {
+    fx.strokeStyle = rgba(BRASS, 0.32 * (1 - ring)); fx.lineWidth = 2;
+    fx.beginPath(); fx.arc(M_CENTER.x, M_CENTER.y, 60 + 680 * easeOut(ring), 0, Math.PI * 2); fx.stroke();
+  }
+}
+
+function drawOverlay(t, frame) {
+  over.clearRect(0, 0, W, H);
+  const v = over.createRadialGradient(540, 860, 420, 540, 860, 1250);
+  v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(0,0,0,0.55)");
+  over.fillStyle = v; over.fillRect(0, 0, W, H);
+  over.save();
+  over.globalCompositeOperation = "overlay"; over.globalAlpha = 0.07;
+  over.drawImage(grain[frame % 4], 0, 0, W, H);
+  over.restore();
+  if (GUIDES) {
+    over.fillStyle = "rgba(255,0,60,0.22)";
+    over.fillRect(0, 0, W, Math.round(H * 0.14));
+    over.fillRect(0, Math.round(H * 0.65), W, H);
+    over.fillRect(0, 0, 65, H); over.fillRect(W - 65, 0, 65, H);
+    over.strokeStyle = "rgba(0,200,255,0.8)"; over.lineWidth = 3;
+    over.strokeRect(0, (H - 1350) / 2, W, 1350);
+  }
+}
+
+// ---------- typography ----------
+const textRoot = document.getElementById("text");
+const cards = [];
+const wordsOf = (s) => s.split(/\s+/).filter(Boolean);
+
+function buildLine(segs, cls = "") {
+  const el = document.createElement("div");
+  el.className = `line ${cls}`;
+  const words = [];
+  segs.forEach((seg, si) => {
+    const list = wordsOf(seg.text), dur = seg.end - seg.start;
+    list.forEach((w, i) => {
+      const span = document.createElement("span");
+      span.className = `w${seg.tone === "brass" ? " tone-brass" : ""}`;
+      span.textContent = w;
+      if (el.childNodes.length) el.appendChild(document.createTextNode(" "));
+      el.appendChild(span);
+      const at = seg.fast ? (seg.start < 0.05 ? -1 : seg.start - 0.08 + i * 0.05) : seg.start - 0.06 + (i / list.length) * dur * 0.75;
+      words.push({ el: span, at });
+    });
+  });
+  return { el, words };
+}
+
+function addCard(id, start, end, layout, lines) {
+  const el = document.createElement("div");
+  el.className = `card ${layout}`;
+  const words = [];
+  lines.forEach((segs) => { const l = buildLine(segs); el.appendChild(l.el); words.push(...l.words); });
+  textRoot.appendChild(el);
+  cards.push({ id, start, end, el, words });
+  return el;
+}
+const seg = (p, tone = "ivory") => ({ ...p, tone });
+
+let ledgerRows = [], endEls = null;
+function build() {
+  const hookLines = TL.hook.map((s, i) => [{ ...s, tone: i ? "brass" : "ivory", fast: true }]);
+  addCard("hook", 0, K.problem, `center hook${hookLines.length > 1 ? " two" : ""}`, hookLines);
+  addCard("problem", K.problem, K.brand, "top", [[seg(P.P1)], [seg(P.P2, "brass")]]);
+  addCard("brand", K.brand, K.convert, "center", [[seg(P.P3)], [seg(P.P4)]]);
+  addCard("convert", K.convert, K.ledger, "top", [[seg(P.P5)], [seg(P.P6, "brass")]]);
+  addCard("ledger", K.ledger, K.seats, "top compact", [[seg(P.P7)], [seg(P.P8)], [seg(P.P9, "brass")]]);
+  addCard("seats", K.seats, K.end, "top compact", [[seg(P.P10)], [seg(P.P11, "brass")]]);
+
+  const ledger = document.createElement("div");
+  ledger.className = "ledger";
+  const rowStarts = [P.P7.start + 0.1, P.P8.start, P.P9.start];
+  CFG.ledger.rows.forEach((row, i) => {
+    const r = document.createElement("div");
+    r.className = "row";
+    r.innerHTML = `<div class="rule"></div><span class="label"></span><span class="value"></span>`;
+    r.querySelector(".label").textContent = row.label;
+    ledger.appendChild(r);
+    ledgerRows.push({ el: r, rule: r.querySelector(".rule"), value: r.querySelector(".value"), row, at: rowStarts[i] });
+  });
+  if (CFG.ledger.placeholder) {
+    const note = document.createElement("div");
+    note.className = "note"; note.textContent = CFG.ledger.note;
+    ledger.appendChild(note);
+    ledgerRows.note = note;
+  }
+  textRoot.appendChild(ledger);
+  cards.find((c) => c.id === "ledger").ledger = ledger;
+
+  const end = document.createElement("div");
+  end.className = "end";
+  end.innerHTML = `
+    <div class="wordmark"><div class="latin"></div><div class="arabic"></div></div>
+    <div class="tagline"></div>
+    <div class="cta"><div class="rule"></div></div>`;
+  end.querySelector(".latin").textContent = CFG.brand.latin;
+  end.querySelector(".arabic").textContent = CFG.brand.arabic;
+  const tag = buildLine([seg(P.P15)]);
+  end.querySelector(".tagline").appendChild(tag.el);
+  const cta1 = buildLine([seg(P.P12)]), cta2 = buildLine([seg(P.P13)]);
+  end.querySelector(".cta").append(cta1.el, cta2.el);
+  textRoot.appendChild(end);
+  endEls = {
+    root: end, latin: end.querySelector(".latin"), arabic: end.querySelector(".arabic"),
+    rule: end.querySelector(".cta .rule"), words: [...tag.words, ...cta1.words, ...cta2.words],
+  };
+}
+
+function setWord(w, t) {
+  const p = easeOut(prog(t, w.at, 0.34));
+  w.el.style.opacity = p;
+  w.el.style.transform = `translateY(${(1 - p) * 22}px)`;
+  w.el.style.filter = p < 1 ? `blur(${(1 - p) * 8}px)` : "none";
+}
+
+function renderText(t) {
+  for (const c of cards) {
+    const ex = prog(t, c.end - 0.32, 0.3);
+    const visible = t >= c.start - 0.35 && ex < 1;
+    c.el.style.visibility = visible ? "visible" : "hidden";
+    if (c.ledger) c.ledger.style.visibility = visible ? "visible" : "hidden";
+    if (!visible) continue;
+    const style = `translateY(${-16 * ex}px)`;
+    c.el.style.opacity = 1 - ex; c.el.style.transform = style;
+    c.el.style.filter = ex > 0 ? `blur(${6 * ex}px)` : "none";
+    c.words.forEach((w) => setWord(w, t));
+    if (c.ledger) {
+      c.ledger.style.opacity = 1 - ex; c.ledger.style.transform = style;
+      for (const r of ledgerRows) {
+        const p = easeOut(prog(t, r.at, 0.55)), count = easeOut(prog(t, r.at + 0.1, 0.9));
+        r.rule.style.transform = `scaleX(${easeInOut(prog(t, r.at - 0.1, 0.6))})`;
+        r.el.querySelector(".label").style.opacity = p;
+        r.value.style.opacity = p;
+        r.value.style.transform = `translateY(${(1 - p) * 18}px)`;
+        const v = r.row.value * count;
+        r.value.textContent = r.row.prefix + v.toLocaleString("en-US", { minimumFractionDigits: r.row.decimals, maximumFractionDigits: r.row.decimals });
+      }
+      if (ledgerRows.note) ledgerRows.note.style.opacity = easeOut(prog(t, P.P9.start + 0.4, 0.5));
+    }
+  }
+  const e = endEls;
+  const on = t >= K.end;
+  e.root.style.visibility = on ? "visible" : "hidden";
+  if (!on) return;
+  e.words.forEach((w) => setWord(w, t));
+  const wm = easeOut(prog(t, CUE.sweep - 0.15, 1.1));
+  e.latin.style.opacity = wm;
+  e.latin.style.letterSpacing = `${lerp(0.32, 0.03, wm)}em`;
+  e.latin.style.filter = wm < 1 ? `blur(${(1 - wm) * 6}px)` : "none";
+  const ar = easeOut(prog(t, CUE.sweep + 0.25, 0.6));
+  e.arabic.style.opacity = ar;
+  e.arabic.style.transform = `translateY(${(1 - ar) * 14}px)`;
+  e.rule.style.transform = `scaleX(${easeInOut(prog(t, P.P12.start - 0.15, 0.6))})`;
+}
+
+window.renderAt = (t) => {
+  const frame = Math.round(t * TL.fps);
+  drawBackground(t);
+  drawField(t);
+  drawCustomers(t);
+  drawBubbles(t);
+  drawSeats(t);
+  drawMonogram(t);
+  renderText(t);
+  drawOverlay(t, frame);
+};
+
+window.ready = (async () => {
+  const [tl, cfg] = await Promise.all([
+    fetch(`../build/timeline_${VARIANT}.json`).then((r) => r.json()),
+    fetch("../config.json").then((r) => r.json()),
+  ]);
+  TL = tl; CFG = cfg; P = tl.phrases; K = tl.cards; CUE = tl.cues;
+  build();
+  await Promise.all([
+    document.fonts.load('700 92px "Amiri"', "ابعتلنا…"), document.fonts.load('400 44px "Amiri"', "ماستريكس"),
+    document.fonts.load('500 40px "IBM Plex Sans Arabic"', "صرف"), document.fonts.load('600 92px "Cormorant Garamond"', "Mastrix 0123"),
+  ]);
+  await document.fonts.ready;
+  window.renderAt(Number(params.get("t") || 0));
+  if (params.has("play")) {
+    const t0 = performance.now();
+    const loop = () => { window.renderAt(((performance.now() - t0) / 1000) % TL.duration); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  }
+  return true;
+})();
+</script>
+</body>
+</html>
