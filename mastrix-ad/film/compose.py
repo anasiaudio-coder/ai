@@ -58,7 +58,10 @@ def main():
             fw, fh = round(1080 * scale / 2) * 2, round(1920 * scale / 2) * 2
             vf.append(f"{base},tpad=stop_mode=clone:stop_duration={lens[i]},trim=duration={lens[i]},split[e1][e2]")
             vf.append("[e1]scale=1296:2304,crop=1080:1920,boxblur=28:2[eb]")
-            vf.append(f"[e2]scale={fw}:{fh}[ef]")
+            # feather the inset's edges into the blurred fill so no frame line shows
+            vf.append(f"[e2]scale={fw}:{fh},format=yuva420p,"
+                      "geq=lum='lum(X,Y)':cb='cb(X,Y)':cr='cr(X,Y)':"
+                      "a='255*clip(min(min(X,W-X),min(Y,H-Y))/110,0,1)'[ef]")
             vf.append(f"[eb][ef]overlay=x=(W-w)/2:y=20,format=yuv420p[v{i}]")
         else:
             vf.append(f"{base},format=yuv420p[v{i}]")
