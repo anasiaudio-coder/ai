@@ -11,8 +11,13 @@
   "license": "ISC",
   "dependencies": {
     "@fontsource/amiri": "^5.3.0",
+    "@fontsource/bodoni-moda": "^5.3.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "@fontsource/marcellus": "^5.3.0",
+    "@fontsource/readex-pro": "^5.3.0",
+    "@fontsource/syne": "^5.3.0",
     "playwright-core": "^1.56.1"
   }
 }

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Mastrix Logo Directions</title>
+<style>
+@import url(../node_modules/@fontsource/amiri/400.css);
+@import url(../node_modules/@fontsource/amiri/700.css);
+@import url(../node_modules/@fontsource/ibm-plex-sans-arabic/500.css);
+@import url(../node_modules/@fontsource/cormorant-garamond/600.css);
+@import url(../node_modules/@fontsource/readex-pro/400.css);
+@import url(../node_modules/@fontsource/readex-pro/500.css);
+@import url(../node_modules/@fontsource/manrope/700.css);
+@import url(../node_modules/@fontsource/manrope/800.css);
+@import url(../node_modules/@fontsource/bodoni-moda/500.css);
+@import url(../node_modules/@fontsource/bodoni-moda/700.css);
+@import url(../node_modules/@fontsource/marcellus/400.css);
+@import url(../node_modules/@fontsource/syne/700.css);
+
+:root {
+  --page: #06150F;
+  --tile: #0B231C;
+  --info: #091C16;
+  --ivory: #EEE6D6;
+  --ivory-soft: rgba(238, 230, 214, .66);
+  --ivory-faint: rgba(238, 230, 214, .42);
+  --brass: #C9A86A;
+  --line: rgba(201, 168, 106, .22);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--page); color: var(--ivory); font-family: "IBM Plex Sans Arabic", sans-serif; }
+
+/* ---------- detail sheets ---------- */
+.sections { width: 1196px; padding: 36px; display: grid; gap: 36px; }
+.territory { background: var(--page); padding: 40px 8px 8px; }
+.territory h2 { font-family: "Amiri", serif; font-weight: 700; font-size: 60px; line-height: 1.1; }
+.territory > p { font-size: 26px; color: var(--ivory-soft); margin: 10px 0 30px; }
+.grid { display: grid; grid-template-columns: repeat(2, 540px); gap: 28px; }
+
+.card { background: var(--info); border-radius: 18px; overflow: hidden; }
+.hero { position: relative; height: 460px; background: var(--tile); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; }
+.hero .sym { width: 184px; height: 184px; }
+.wm { text-align: center; }
+.wm .latin { direction: ltr; white-space: nowrap; color: var(--ivory); line-height: 1.1; }
+.wm .ar { color: var(--brass); margin-top: 8px; line-height: 1.2; }
+.meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 18px; align-items: baseline; padding: 24px 28px 6px; }
+.num { font-family: "Cormorant Garamond", serif; font-weight: 600; font-size: 52px; color: var(--brass); line-height: 1; grid-row: span 2; direction: ltr; }
+.name { font-family: "Amiri", serif; font-weight: 700; font-size: 34px; line-height: 1.2; }
+.idea { font-size: 21px; color: var(--ivory-soft); line-height: 1.45; }
+.tests { display: flex; gap: 22px; align-items: flex-end; padding: 18px 28px 26px; border-top: 1px solid var(--line); margin-top: 18px; }
+.test { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 16px; color: var(--ivory-faint); }
+.avatar { width: 92px; height: 92px; border-radius: 50%; background: var(--tile); display: grid; place-items: center; overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
+.avatar .sym { width: 66px; height: 66px; }
+.fav { width: 28px; height: 28px; border-radius: 6px; background: var(--tile); display: grid; place-items: center; box-shadow: 0 0 0 1px var(--line); }
+.fav .sym { width: 24px; height: 24px; }
+.inverse { width: 92px; height: 92px; border-radius: 12px; background: #EEE6D6; display: grid; place-items: center; }
+.inverse .sym { width: 70px; height: 70px; }
+
+/* ---------- overview ---------- */
+.overview { width: 1760px; padding: 48px; }
+.overview header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 36px; }
+.overview h1 { font-family: "Amiri", serif; font-weight: 700; font-size: 64px; }
+.overview header p { font-size: 26px; color: var(--ivory-soft); }
+.ogrid { display: grid; grid-template-columns: repeat(4, 400px); gap: 24px; }
+.otile { position: relative; height: 400px; background: var(--tile); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+.otile .sym { width: 150px; height: 150px; }
+.otile .num { position: absolute; top: 18px; right: 22px; font-size: 40px; }
+.otile .wm { transform: scale(.78); transform-origin: center top; margin-bottom: -18px; }
+.otile.t-start { box-shadow: inset 0 0 0 1.5px var(--line); }
+
+/* custom wordmarks */
+.wm18 { direction: ltr; display: flex; align-items: center; justify-content: center; font-family: "Manrope", sans-serif; font-weight: 800; font-size: 54px; letter-spacing: .06em; line-height: 1; }
+.wm18 svg { width: 39px; height: 39px; margin-left: .07em; }
+.wm18-sub { direction: ltr; font-family: "Manrope", sans-serif; font-weight: 700; font-size: 17px; letter-spacing: .62em; color: var(--ivory-soft); margin-top: 12px; padding-left: .62em; }
+</style>
+</head>
+<body>
+<main id="root"></main>
+<script src="marks.js"></script>
+<script>
+const view = new URLSearchParams(location.search).get("view") || "sections";
+const AR = "ماستريكس ميديا";
+const WM = (n) => {
+  if (n <= 4 || n === 19) return { text: "Mastrix Media", font: "Cormorant Garamond", w: 600, size: 48, ls: ".01em", arFont: "Amiri", arW: 400, arSize: 29 };
+  if (n <= 8) return { text: "mastrix media", font: "Readex Pro", w: 500, size: 42, ls: "-.01em", arFont: "Readex Pro", arW: 400, arSize: 26 };
+  if (n <= 12) return { text: "MASTRIX MEDIA", font: "Manrope", w: 700, size: 33, ls: ".16em", arFont: "IBM Plex Sans Arabic", arW: 500, arSize: 25 };
+  if (n === 15) return { text: "Mastrix Media", font: "Bodoni Moda", w: 500, size: 42, ls: "0", arFont: "Amiri", arW: 400, arSize: 29 };
+  if (n === 14) return { text: "Mastrix Media", font: "Marcellus", w: 400, size: 38, ls: ".04em", arFont: "Amiri", arW: 400, arSize: 28 };
+  if (n === 20) return { text: "Mastrix Media", font: "Syne", w: 700, size: 42, ls: "-.01em", arFont: "Readex Pro", arW: 400, arSize: 26 };
+  return { text: "MASTRIX MEDIA", font: "Marcellus", w: 400, size: 34, ls: ".22em", arFont: "Amiri", arW: 400, arSize: 28 };
+};
+
+function symbol(mark, pal, cls = "sym") {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("viewBox", mark.wide ? IJAM.viewBox : "0 0 200 200"); s.setAttribute("class", cls);
+  s.innerHTML = mark.svg(PALETTES[pal]);
+  return s;
+}
+
+function wordmark(mark) {
+  const el = document.createElement("div");
+  el.className = "wm";
+  if (mark.n === 17) {
+    el.innerHTML = `<div class="latin" style="font-family:'Cormorant Garamond';font-weight:600;font-size:22px;letter-spacing:.42em;padding-left:.42em;color:var(--ivory-soft)">MASTRIX MEDIA</div>`;
+    return el;
+  }
+  if (mark.n === 18) {
+    el.innerHTML = `<div class="wm18">MASTRI<svg viewBox="37 37 126 126">${xMark(PALETTES.dark, 25)}</svg></div><div class="wm18-sub">MEDIA</div><div class="ar" style="font-family:'IBM Plex Sans Arabic';font-weight:500;font-size:24px">${AR}</div>`;
+    return el;
+  }
+  const w = WM(mark.n);
+  el.innerHTML = `<div class="latin" style="font-family:'${w.font}';font-weight:${w.w};font-size:${w.size}px;letter-spacing:${w.ls}"></div>
+    <div class="ar" style="font-family:'${w.arFont}';font-weight:${w.arW};font-size:${w.arSize}px"></div>`;
+  el.querySelector(".latin").textContent = w.text;
+  el.querySelector(".ar").textContent = AR;
+  return el;
+}
+
+function hero(mark) {
+  const h = document.createElement("div");
+  h.className = "hero";
+  if (mark.n === 17) {
+    const s = symbol(mark, "dark", "sym wide");
+    s.style.cssText = "width:450px;height:auto";
+    h.append(s, wordmark(mark));
+  } else if (mark.n === 18) {
+    h.append(wordmark(mark));
+  } else {
+    h.append(symbol(mark, "dark"), wordmark(mark));
+  }
+  return h;
+}
+
+function test(label, cls, mark, pal) {
+  const t = document.createElement("div");
+  t.className = "test";
+  const box = document.createElement("div");
+  box.className = cls;
+  box.append(symbol(mark, pal));
+  t.append(box, Object.assign(document.createElement("span"), { textContent: label }));
+  return t;
+}
+
+function card(mark) {
+  const c = document.createElement("article");
+  c.className = "card";
+  c.append(hero(mark));
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.innerHTML = `<span class="num">${String(mark.n).padStart(2, "0")}</span><span class="name"></span><span class="idea"></span>`;
+  meta.querySelector(".name").textContent = mark.name;
+  meta.querySelector(".idea").textContent = mark.idea;
+  const tests = document.createElement("div");
+  tests.className = "tests";
+  tests.append(test("صورة البروفايل", "avatar", mark, "dark"), test("أيقونة صغيرة", "fav", mark, "dark"), test("خلفية فاتحة", "inverse", mark, "light"));
+  c.append(meta, tests);
+  return c;
+}
+
+async function build() {
+const root = document.getElementById("root");
+if (view === "sections") {
+  root.className = "sections";
+  TERRITORIES.forEach((t, i) => {
+    const s = document.createElement("section");
+    s.className = "territory"; s.id = `t${i + 1}`;
+    s.innerHTML = `<h2></h2><p></p><div class="grid"></div>`;
+    s.querySelector("h2").textContent = t.title;
+    s.querySelector("p").textContent = t.line;
+    MARKS.filter((m) => m.n >= t.from && m.n < t.from + 4).forEach((m) => s.querySelector(".grid").append(card(m)));
+    root.append(s);
+  });
+} else {
+  root.className = "overview";
+  root.innerHTML = `<header><h1>Mastrix Media: 20 لوغو</h1><p>اختار الرقم اللي عاجبك</p></header><div class="ogrid"></div>`;
+  MARKS.forEach((m) => {
+    const t = document.createElement("div");
+    t.className = `otile${(m.n - 1) % 4 === 0 ? " t-start" : ""}`;
+    t.innerHTML = `<span class="num">${String(m.n).padStart(2, "0")}</span>`;
+    if (m.n === 17) {
+      const s = symbol(m, "dark", "sym wide");
+      s.style.cssText = "width:340px;height:auto";
+      t.append(s, wordmark(m));
+    } else if (m.n === 18) {
+      t.append(wordmark(m));
+    } else {
+      t.append(symbol(m, "dark"), wordmark(m));
+    }
+    root.querySelector(".ogrid").append(t);
+  });
+}
+}
+
+window.ready = (async () => {
+  const src = await fetch("assets/ijam.svg").then((r) => r.text());
+  window.IJAM = { viewBox: src.match(/viewBox="([^"]+)"/)[1], inner: src.slice(src.indexOf(">") + 1, src.lastIndexOf("</svg>")) };
+  await build();
+  await Promise.all([
+    document.fonts.load('400 30px "Amiri"', "ماستريكس"), document.fonts.load('80px "Marcellus"', "M"),
+    document.fonts.load('700 100px "Bodoni Moda"', "M"),
+  ]);
+  await document.fonts.ready;
+  return true;
+})();
+</script>
+</body>
+</html>

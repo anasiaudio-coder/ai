@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="0" y="0" width="200" height="200" fill="#0B231C"/><mask id="m5-13"><rect width="200" height="200" fill="#fff"/>
+        <polyline points="64,124 64,66 100,106 136,66 136,124" fill="none" stroke="#000" stroke-width="15" stroke-linejoin="round" stroke-linecap="round"/></mask>
+        <g mask="url(#m5-13)"><rect x="24" y="28" width="152" height="124" rx="36" fill="#C9A86A"/>
+        <path d="M52,146 L42,180 L90,148 Z" fill="#C9A86A"/></g></svg>

@@ -30,6 +30,18 @@ node scripts/render.mjs stills A 0,5.6,16.9 --guides   # فريمات مع من�
 1080×1920، 30fps، H.264 High، AAC 48kHz، −14 LUFS. كل النصوص ضمن المنطقة الآمنة لـReels
 (بعيد عن أعلى 14% وأسفل 35%) وضمن قصّة 4:5 بالفيد.
 
+## اللوغوهات (20 اتجاه)
+- `logos/out/overview.png`: كل الـ20 بنظرة وحدة
+- `logos/out/sheet_1..5.png`: كل اتجاه لحاله، مع اختبار صورة البروفايل والأيقونة الصغيرة والخلفية الفاتحة
+- `logos/out/svg/NN.svg`: كل رمز vector
+- الرموز مرسومة بالكود بـ`logos/marks.js`. لوغو 17 مبني من خط Amiri نفسه
+  (`scripts/ijam_svg.py`)، والنقاط مفصولة عن الحروف بشكل vector حقيقي.
+
+```bash
+python3 -I scripts/ijam_svg.py   # يحتاج: pip install uharfbuzz fonttools brotli
+node logos/render.mjs
+```
+
 ## الصوت
 التعليق الصوتي: ElevenLabs، صوت «Mohammad – Warm Arabic Commercial» (لهجة شامية)، take 1.
 الموسيقى والمؤثرات مولّدة بالكود (`build_audio.py`) — بدون حقوق ملكية لطرف تالت.

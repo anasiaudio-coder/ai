@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="0" y="0" width="200" height="200" fill="#0B231C"/><defs><path id="t14-14" d="M27,100 A73,73 0 0 1 173,100"/><path id="b14-15" d="M17,100 A83,83 0 0 0 183,100"/></defs>
+        <circle cx="100" cy="100" r="92" fill="none" stroke="#C9A86A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="100" cy="100" r="62" fill="none" stroke="#C9A86A" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+        <text font-family="Marcellus" font-size="15" letter-spacing="4.5" fill="#EEE6D6"><textPath href="#t14-14" startOffset="50%" text-anchor="middle">MASTRIX MEDIA</textPath></text>
+        <text font-family="Amiri" font-weight="700" font-size="17" fill="#EEE6D6"><textPath href="#b14-15" startOffset="50%" text-anchor="middle">ماستريكس ميديا</textPath></text>
+        <circle cx="23" cy="100" r="3" fill="#C9A86A"/><circle cx="177" cy="100" r="3" fill="#C9A86A"/>
+        <text x="100" y="128" text-anchor="middle" font-family="Marcellus" font-size="80" fill="#EEE6D6">M</text></svg>
