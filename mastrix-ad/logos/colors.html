@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Mastrix Color Directions</title>
+<style>
+@import url(../node_modules/@fontsource/amiri/700.css);
+@import url(../node_modules/@fontsource/ibm-plex-sans-arabic/500.css);
+@import url(../node_modules/@fontsource/manrope/700.css);
+@import url(../node_modules/@fontsource/cormorant-garamond/600.css);
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #F4F2EE; color: #1B1B1A; font-family: "IBM Plex Sans Arabic", sans-serif; width: 1640px; }
+.row { display: grid; grid-template-columns: 400px 330px 190px 270px 270px; gap: 22px; align-items: center; padding: 34px 40px; border-bottom: 1px solid #DDD8CF; background: #F4F2EE; }
+.info h2 { font-family: "Amiri", serif; font-weight: 700; font-size: 44px; line-height: 1.15; }
+.info .num { font-family: "Cormorant Garamond", serif; font-weight: 600; font-size: 34px; color: #8A8478; margin-left: 10px; }
+.info p { font-size: 20px; line-height: 1.5; color: #4A4740; margin-top: 8px; }
+.info .risk { color: #8A5A2B; font-size: 18px; margin-top: 6px; }
+.swatches { display: flex; gap: 10px; margin-top: 16px; }
+.sw { width: 112px; }
+.chip { height: 64px; border-radius: 10px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.sw span { display: block; font-size: 15px; color: #5C584F; margin-top: 6px; }
+.sw code { display: block; direction: ltr; text-align: right; font-family: "Manrope", sans-serif; font-size: 15px; color: #1B1B1A; }
+.ratios { font-size: 16px; color: #5C584F; margin-top: 10px; }
+.ratios b { color: #1B1B1A; font-family: "Manrope", sans-serif; }
+
+.logo { height: 300px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+.logo svg { width: 120px; height: 120px; }
+.logo .latin { direction: ltr; font-family: "Manrope", sans-serif; font-weight: 700; font-size: 26px; letter-spacing: .16em; padding-left: .16em; }
+.logo .ar { font-family: "IBM Plex Sans Arabic"; font-weight: 500; font-size: 20px; margin-top: -10px; }
+
+.reel { width: 169px; height: 300px; border-radius: 12px; position: relative; overflow: hidden; display: grid; place-items: center; justify-self: center; }
+.reel .dots { position: absolute; inset: 0; background-image: radial-gradient(circle, var(--dot) 1.1px, transparent 1.6px); background-size: 9.4px 9.4px; opacity: .55; }
+.reel .hook { position: relative; font-family: "Amiri", serif; font-weight: 700; font-size: 22px; line-height: 1.3; text-align: center; padding: 0 12px; }
+
+.feed { border-radius: 14px; padding: 12px; height: 300px; }
+.post { border-radius: 10px; overflow: hidden; height: 100%; display: flex; flex-direction: column; }
+.head { display: flex; align-items: center; gap: 8px; padding: 9px 10px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.avatar svg { width: 24px; height: 24px; }
+.who { line-height: 1.15; }
+.who b { display: block; direction: ltr; text-align: right; font-family: "Manrope", sans-serif; font-size: 13px; }
+.who span { font-size: 11px; opacity: .6; }
+.media { flex: 1; display: grid; place-items: center; position: relative; overflow: hidden; }
+.media .hook { font-family: "Amiri", serif; font-weight: 700; font-size: 25px; line-height: 1.3; text-align: center; position: relative; }
+.media .dots { position: absolute; inset: 0; background-image: radial-gradient(circle, var(--dot) 1.1px, transparent 1.6px); background-size: 10px 10px; opacity: .5; }
+.cta { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 12px; }
+.cta i { font-style: normal; border-radius: 6px; padding: 4px 10px; font-size: 12px; }
+.label { font-size: 15px; color: #6B675E; text-align: center; margin-top: 8px; }
+.col { display: flex; flex-direction: column; }
+</style>
+</head>
+<body>
+<main id="root"></main>
+<script src="marks.js"></script>
+<script>
+const P = [
+  { name: "البنك الخاص", tag: "الحالي", bg: "#0B231C", fg: "#EEE6D6", accent: "#C9A86A",
+    why: "ثقة ومال وهدوء. نفس ألوان الإعلان اللي عملناه.",
+    risk: "الأخضر مع فكرة المحادثة ممكن يتقرا «واتساب»، وهاد ممكن يكون ميزة." },
+  { name: "حبر وزعفران", bg: "#0F1B2D", fg: "#F2ECE1", accent: "#E3A72F",
+    why: "كحلي البنوك مع زعفران دافي: ثقة، بس فيها طاقة وحرارة.",
+    risk: "الكحلي بعيد كفاية عن أزرق فيسبوك، بس ما يفتح أكثر من هيك." },
+  { name: "النبيذي", bg: "#3A1016", fg: "#F3E7D9", accent: "#D2925F",
+    why: "لغة بيوت الأزياء. نادر جداً بين شركات التسويق، فبتنحفظ.",
+    risk: "ممكن يتقرا «مطعم أو نبيذ» إذا الخط مش حاد." },
+  { name: "الأحمر الملكي", bg: "#9C1C2B", fg: "#F7EFE4", accent: "#E9C77F",
+    why: "أقوى لون بيوقّف الإصبع بالفيد. الأحمر = بيع وعجلة، والذهبي بيخلّيه فاخر.",
+    risk: "صاخب. لازم مساحات فاضية كثير، وإلا بصير رخيص." },
+  { name: "حجر القدس", bg: "#E8E1D3", fg: "#23221F", accent: "#5E6E2A",
+    why: "فاتح، لون حجر البلاد مع أخضر الزيتون. محلي وراقي، وبيبرز بالوضع الغامق.",
+    risk: "بالوضع الفاتح للفيد ممكن يذوب. بيحتاج إطار أو ظل." },
+  { name: "فيروزي ومرجاني", bg: "#0C3A44", fg: "#EAF2EE", accent: "#FF7A59",
+    why: "حديث وشبابي. المرجاني على الفيروزي بيصرخ بدون ما يكون رخيص.",
+    risk: "أقل «فخامة» من الباقيين، وأقرب لستارت أب." },
+];
+
+const lum = (h) => {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+    .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+const grade = (r) => (r >= 7 ? "ممتاز" : r >= 4.5 ? "منيح" : r >= 3 ? "للعناوين بس" : "ضعيف");
+const mark11 = MARKS.find((m) => m.n === 11);
+const svg11 = (p) => `<svg viewBox="0 0 200 200">${mark11.svg({ bg: p.bg, fg: p.fg, accent: p.accent, dim: p.fg + "55" })}</svg>`;
+const FEEDS = { light: { page: "#F0F2F5", card: "#FFFFFF", ink: "#050505", btn: "#E4E6EB" }, dark: { page: "#18191A", card: "#242526", ink: "#E4E6EB", btn: "#3A3B3C" } };
+
+function feed(p, mode) {
+  const f = FEEDS[mode];
+  return `<div class="col"><div class="feed" style="background:${f.page}"><div class="post" style="background:${f.card};color:${f.ink}">
+    <div class="head"><div class="avatar" style="background:${p.bg}">${svg11(p)}</div><div class="who"><b>Mastrix Media</b><span>ممول</span></div></div>
+    <div class="media" style="background:${p.bg};--dot:${p.fg}"><div class="dots"></div><div class="hook" style="color:${p.fg}">اللايكات ما<br>بتدفع إيجار.</div></div>
+    <div class="cta"><span>ابعتلنا على واتساب</span><i style="background:${f.btn}">إرسال رسالة</i></div>
+  </div></div><div class="label">${mode === "light" ? "فيسبوك، الوضع الفاتح" : "فيسبوك، الوضع الغامق"}</div></div>`;
+}
+
+const root = document.getElementById("root");
+P.forEach((p, i) => {
+  const rt = ratio(p.fg, p.bg), ra = ratio(p.accent, p.bg);
+  const row = document.createElement("section");
+  row.className = "row"; row.id = `p${i + 1}`;
+  row.innerHTML = `
+    <div class="info">
+      <h2><span class="num">${String.fromCharCode(65 + i)}</span>${p.name}${p.tag ? ` <span style="font-size:22px;color:#8A8478">(${p.tag})</span>` : ""}</h2>
+      <p>${p.why}</p><p class="risk">${p.risk}</p>
+      <div class="swatches">${[["خلفية", p.bg], ["نص", p.fg], ["لمسة", p.accent]].map(([l, c]) => `<div class="sw"><div class="chip" style="background:${c}"></div><span>${l}</span><code>${c}</code></div>`).join("")}</div>
+      <div class="ratios">تباين النص <b><bdi dir="ltr">${rt.toFixed(1)}:1</bdi></b> ${grade(rt)}<br>تباين اللمسة <b><bdi dir="ltr">${ra.toFixed(1)}:1</bdi></b> ${grade(ra)}<br>بروز عن الفيد: فاتح <b><bdi dir="ltr">${ratio(p.bg, FEEDS.light.card).toFixed(1)}:1</bdi></b> · غامق <b><bdi dir="ltr">${ratio(p.bg, FEEDS.dark.card).toFixed(1)}:1</bdi></b></div>
+    </div>
+    <div class="logo" style="background:${p.bg}">${svg11(p)}<div class="latin" style="color:${p.fg}">MASTRIX MEDIA</div><div class="ar" style="color:${p.accent}">ماستريكس ميديا</div></div>
+    <div class="col"><div class="reel" style="background:${p.bg};--dot:${p.fg}"><div class="dots"></div><div class="hook" style="color:${p.fg}">اللايكات ما بتدفع <span style="color:${p.accent}">إيجار.</span></div></div><div class="label">فريم الإعلان</div></div>
+    ${feed(p, "light")}${feed(p, "dark")}`;
+  root.append(row);
+});
+window.ready = document.fonts.ready.then(() => true);
+</script>
+</body>
+</html>
