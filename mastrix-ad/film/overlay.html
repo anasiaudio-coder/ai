@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Mastrix Film Overlay</title>
+<style>
+@import url(../node_modules/@fontsource/amiri/700.css);
+@import url(../node_modules/@fontsource/ibm-plex-sans-arabic/500.css);
+@import url(../node_modules/@fontsource/manrope/700.css);
+
+:root { --ivory: #EEE6D6; --brass: #C9A86A; --halo: rgba(3, 10, 8, .85); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+#stage { position: relative; width: 1080px; height: 1920px; }
+/* the brass edge separates the ad from Facebook's dark-mode feed (separation ~6.8:1 vs ~1.1:1 without) */
+.frame { position: absolute; inset: 0; border: 6px solid var(--brass); }
+.scrim { position: absolute; left: 0; right: 0; top: 860px; bottom: 0;
+  background: linear-gradient(to bottom, rgba(3,10,8,0) 0%, rgba(3,10,8,.55) 38%, rgba(3,10,8,.7) 100%); }
+.band { position: absolute; left: 70px; right: 70px; top: 1020px; height: 226px;
+  display: flex; align-items: center; justify-content: center; text-align: center; }
+.line { font-family: "Amiri", serif; font-weight: 700; font-size: 70px; line-height: 1.4; color: var(--ivory);
+  text-wrap: balance; text-shadow: 0 0 24px var(--halo), 0 0 50px var(--halo); visibility: hidden; position: absolute; left: 0; right: 0; }
+.line.hook { font-size: 104px; line-height: 1.28; }
+.brass { color: var(--brass); }
+.w { display: inline-block; }
+.end { position: absolute; left: 0; right: 0; top: 1010px; text-align: center; visibility: hidden; }
+.end .latin { direction: ltr; font-family: "Manrope", sans-serif; font-weight: 700; font-size: 40px; letter-spacing: .2em; padding-left: .2em; color: var(--ivory); }
+.end .ar { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 500; font-size: 30px; color: var(--brass); margin-top: 6px; }
+.tag { position: absolute; left: 70px; right: 70px; top: 1118px; text-align: center; visibility: hidden;
+  font-family: "Amiri", serif; font-weight: 700; font-size: 84px; color: var(--ivory); text-shadow: 0 0 24px var(--halo); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="scrim"></div>
+  <div class="band" id="band"></div>
+  <div class="end" id="end"><div class="latin">MASTRIX MEDIA</div><div class="ar">ماستريكس ميديا</div></div>
+  <div class="tag" id="tag"></div>
+  <div class="frame"></div>
+</div>
+<script>
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, s, d) => clamp((t - s) / d);
+const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+const BRASS = new Set(["P2", "P6", "P9", "P11"]);
+let items = [], tagWords = [], P, END;
+
+function lineEl(text, cls, start, dur, fast) {
+  const el = document.createElement("div");
+  el.className = `line ${cls}`;
+  const words = text.split(/\s+/).filter(Boolean);
+  const spans = words.map((w, i) => {
+    const s = document.createElement("span");
+    s.className = "w"; s.textContent = w;
+    if (i) el.appendChild(document.createTextNode(" "));
+    el.appendChild(s);
+    return { el: s, at: fast ? -1 : start - 0.06 + (i / words.length) * dur * 0.75 };
+  });
+  return { el, spans };
+}
+
+function setWords(spans, t) {
+  for (const w of spans) {
+    const p = easeOut(prog(t, w.at, 0.32));
+    w.el.style.opacity = p;
+    w.el.style.transform = `translateY(${(1 - p) * 18}px)`;
+    w.el.style.filter = p < 1 ? `blur(${(1 - p) * 7}px)` : "none";
+  }
+}
+
+async function init() {
+  const tl = await fetch("../build/timeline_A.json").then((r) => r.json());
+  P = tl.phrases;
+  const band = document.getElementById("band");
+  const ids = Object.keys(P);
+  const hook = tl.hook.map((h) => h.text).join(" ");
+  const h = lineEl(hook, "hook", 0, 1.6, true);
+  band.append(h.el);
+  items.push({ ...h, from: -1, to: P.P1.start - 0.12 });
+  ids.filter((id) => id !== "P14" && id !== "P15").forEach((id, k) => {
+    const p = P[id], next = P[ids[k + 1]];
+    const l = lineEl(p.text, BRASS.has(id) ? "brass" : "", p.start, p.end - p.start, false);
+    band.append(l.el);
+    const to = id === "P13" ? P.P14.start - 0.1 : next.start - 0.12;
+    items.push({ ...l, from: p.start - 0.12, to });
+  });
+  const tag = lineEl(P.P15.text, "", P.P15.start, P.P15.end - P.P15.start, false);
+  document.getElementById("tag").append(...tag.el.childNodes);
+  tagWords = tag.spans;
+  END = document.getElementById("end");
+}
+
+window.renderAt = (t) => {
+  for (const it of items) {
+    const on = t >= it.from && t < it.to;
+    it.el.style.visibility = on ? "visible" : "hidden";
+    if (!on) continue;
+    const out = prog(t, it.to - 0.16, 0.16);
+    it.el.style.opacity = 1 - out;
+    setWords(it.spans, t);
+  }
+  const wm = easeOut(prog(t, P.P14.start - 0.1, 0.9));
+  END.style.visibility = wm > 0 ? "visible" : "hidden";
+  END.style.opacity = wm;
+  END.querySelector(".latin").style.letterSpacing = `${0.42 - 0.22 * wm}em`;
+  const tagEl = document.getElementById("tag");
+  tagEl.style.visibility = t >= P.P15.start - 0.1 ? "visible" : "hidden";
+  setWords(tagWords, t);
+};
+
+window.ready = (async () => {
+  await init();
+  await document.fonts.load('700 70px "Amiri"', "اللايكات");
+  await document.fonts.ready;
+  window.renderAt(Number(new URLSearchParams(location.search).get("t") || 0));
+  return true;
+})();
+</script>
+</body>
+</html>

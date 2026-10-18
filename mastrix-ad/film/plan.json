@@ -1,0 +1,62 @@
+{
+  "fps": 24,
+  "duration": 30.0,
+  "dissolve": 0.3,
+  "cdn": "https://d8j0ntlcm91z4.cloudfront.net/user_3JT7mQv7luBNF3QthoTHgXXKs11/",
+  "shots": [
+    {
+      "n": 1,
+      "cut": 0.0,
+      "in": 0.0,
+      "file": "hf_20261018_121910_4ec79c6f-935d-4b39-abfb-07d1235f0861.mp4",
+      "what": "red hearts crumble to ash (hook)"
+    },
+    {
+      "n": 2,
+      "cut": 2.1,
+      "in": 0.2,
+      "file": "hf_20261018_121856_86201e0a-a143-4218-b96d-bc0401da17bb.mp4",
+      "what": "grid of brass spheres, five glow (audience)"
+    },
+    {
+      "n": 3,
+      "cut": 6.4,
+      "in": 0.9,
+      "file": "hf_20261018_121857_0fa81025-bafd-449f-9d9a-3ceb9e43bad0.mp4",
+      "what": "watchmaker tweezers place one sphere (one job)"
+    },
+    {
+      "n": 4,
+      "cut": 9.6,
+      "in": 0.3,
+      "file": "hf_20261018_121857_7050c37b-c99c-42ea-b68f-d230f4270cfd.mp4",
+      "what": "glass chat bubbles rise and turn gold (conversations to sales)"
+    },
+    {
+      "n": 5,
+      "cut": 13.9,
+      "in": 0.6,
+      "file": "hf_20261018_121856_2d5f6005-f250-4353-a96c-4ac115ccd02b.mp4",
+      "what": "coins through a glass maze (every path visible)"
+    },
+    {
+      "n": 6,
+      "cut": 17.4,
+      "in": 0.0,
+      "file": "hf_20261018_121856_c645ee10-df6b-4a03-a9b4-6d7ccd2dbd74.mp4",
+      "what": "private boardroom, limited seats"
+    },
+    {
+      "n": 7,
+      "cut": 22.1,
+      "in": 0.0,
+      "file": "hf_20261018_122107_a47cf96f-01f9-422c-89d8-ce88c33c7181.mp4",
+      "what": "spheres converge into the check-M logo",
+      "endcard": true
+    }
+  ],
+  "endcard": {
+    "scale": 0.8,
+    "lock": 25.7
+  }
+}
